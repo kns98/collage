@@ -11,13 +11,16 @@ namespace CollageMaker
 {
     class Program
     {
+        const string OUTPATH = "out.png";
+
         static void Main(string[] args)
         {
             // args[0] is the base image.
             // args[1] is the directory containing cell images.
             // args[2] is the resolution in pixels (width)
             // args[3] is the resolution in pixels (height)
-            if (args.Length != 4)
+            // args[4] is the resizeType (fit or stretch)
+            if (args.Length != 5)
             {
                 Console.WriteLine("Usage: CollageMaker.exe baseImage cellDirectory width height");
                 Console.WriteLine();
@@ -27,9 +30,12 @@ namespace CollageMaker
             }
 
             Collage collage = new Collage(args[0], Directory.GetFiles(args[1]), new Size(int.Parse(args[2]), int.Parse(args[3])));
-            collage.ToImage().Save(Path.Combine(Directory.GetCurrentDirectory(), "out.png"), ImageFormat.Png);
+            Collage.ResizeType resizeType = args[4].Equals("stretch", StringComparison.CurrentCultureIgnoreCase) ? Collage.ResizeType.Stretch : Collage.ResizeType.Fit;
+            collage.ToImage(resizeType).Save(Path.Combine(Directory.GetCurrentDirectory(), OUTPATH), ImageFormat.Png);
 
-            Console.WriteLine("Output written to out.jpg.  Press any key to continue.");
+            GC.Collect();
+
+            Console.WriteLine("Output written to {0}.  Press any key to continue.", OUTPATH);
             Console.ReadKey();
         }
     }

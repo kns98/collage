@@ -31,7 +31,6 @@ namespace CollageMaker
 
         /// <summary>
         /// A string representing the path to the image, such that Image.FromFile could open it.
-        /// Can be null if the image is not stored on disk.
         /// </summary>
         public string Path
         {
@@ -57,7 +56,7 @@ namespace CollageMaker
             int stride = srcData.Stride;
             IntPtr Scan0 = srcData.Scan0;
 
-            int bppModifier = bitmap.PixelFormat == System.Drawing.Imaging.PixelFormat.Format24bppRgb ? 3 : 4;
+            int bppModifier = Image.GetPixelFormatSize(bitmap.PixelFormat) / 8;
 
             unsafe
             {

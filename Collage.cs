@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
+using System.Collections;
 
 namespace CollageMaker
 {
@@ -17,16 +18,63 @@ namespace CollageMaker
         private Size _sizePixels;
         private Size _sizeImages;
 
-        private void SortCells()
+        public enum ResizeType
         {
-            throw new NotImplementedException();
+            Fit,
+            Stretch
+        };
+
+        private void Shuffle(ref int[] arr)
+        {
+            Random gen = new Random();
+            for (int i = arr.Length - 1; i > 0; i--)
+            {
+                int j = gen.Next(0, i);
+                var temp = arr[j];
+                arr[j] = arr[i];
+                arr[i] = temp;
+            }
         }
 
-        public Bitmap ToImage()
+        private void SortCells()
+        {
+            List<ImageMeta> cellImages = new List<ImageMeta>(this._cellImages);
+            ImageMeta[] sortedCellImages = new ImageMeta[this._cellImages.Length];
+
+            // Shuffle the range (to avoid gradient appearance)
+            int[] range = Enumerable.Range(0, this._baseImageCells.Length).ToArray();
+            Shuffle(ref range);
+
+            foreach (int i in range)
+            {
+                float min = float.PositiveInfinity;
+                int minIndex = -1;
+                for (int j = 0; j < cellImages.Count; j++)
+                {
+                    float distance = cellImages[j].Distance(this._baseImageCells[i]);
+                    if (distance < min)
+                    {
+                        min = distance;
+                        minIndex = j;
+                    }
+                }
+                sortedCellImages[i] = cellImages[minIndex];
+                cellImages.RemoveAt(minIndex);
+            }
+
+            this._cellImages = sortedCellImages;
+        }
+
+        /// <summary>
+        /// Compiles and returns the collage image.
+        /// </summary>
+        /// <param name="stretch">Whether to stretch or fit </param>
+        /// <returns></returns>
+        public Bitmap ToImage(ResizeType resizeType)
         {
             int cellWidth = this._sizePixels.Width / this._sizeImages.Width;
             int cellHeight = this._sizePixels.Height / this._sizeImages.Height;
-
+            
             // Create a canvas to work on.
             Bitmap finalBitmap = new Bitmap(this._sizePixels.Width, this._sizePixels.Height, PixelFormat.Format32bppArgb);
             Graphics graphics = Graphics.FromImage(finalBitmap);
@@ -37,12 +85,23 @@ namespace CollageMaker
             {
                 for (int x = 0; x < this._sizeImages.Width; x++)
                 {
+                    Console.Write("\rCompositing image {0} of {1}.", (y * this._sizeImages.Width) + x, this._cellImages.Length);
                     ImageMeta cellImage = this._cellImages[(y * this._sizeImages.Width) + x];
 
                     // Open and resize the bitmap of the cellImage.
-                    float scalar = Math.Min(cellWidth / (float)cellImage.Size.Width, cellHeight / (float)cellImage.Size.Height);
                     Bitmap cellBitmap = new Bitmap(cellImage.Path);
-                    cellBitmap = new Bitmap(cellBitmap, new Size((int)(cellImage.Size.Width * scalar), (int)(cellImage.Size.Height * scalar)));
+                    switch (resizeType)
+                    {
+                        case ResizeType.Fit:
+                            float fitScalar = Math.Min(cellWidth / (float)cellImage.Size.Width, cellHeight / (float)cellImage.Size.Height);
+                            cellBitmap = new Bitmap(cellBitmap, new Size((int)(cellImage.Size.Width * fitScalar), (int)(cellImage.Size.Height * fitScalar)));
+                            break;
+                        case ResizeType.Stretch:
+                            float stretchScalarX = cellWidth / (float)cellImage.Size.Width;
+                            float stretchScalarY = cellHeight / (float)cellImage.Size.Height;
+                            cellBitmap = new Bitmap(cellBitmap, new Size((int)(cellImage.Size.Width * stretchScalarX), (int)(cellImage.Size.Height * stretchScalarY)));
+                            break;
+                    }
 
                     // Find the offset needed (X or Y) to center the image on the square.
                     int offsetX = (cellBitmap.Width < cellWidth ? (cellWidth - cellBitmap.Width) / 2 : 0);
@@ -53,6 +112,7 @@ namespace CollageMaker
                 }
             }
 
+            Console.WriteLine();
             return finalBitmap;
         }
 
@@ -72,19 +132,24 @@ namespace CollageMaker
             // Get ImageMetas from the cell images.
             for (int i = 0; i < cellImagePaths.Length; i++)
             {
+                Console.Write("\rProcessing Image {0} of {1}", i, cellImagePaths.Length);
+
                 Bitmap cellBitmap;
                 try
                 {
                     cellBitmap = new Bitmap(cellImagePaths[i]);
                 }
-                catch (ArgumentException ex)
+                catch (ArgumentException)
                 {
-                    Console.WriteLine("Error processing image {0}:\n{1}", cellImagePaths[i], ex.ToString());
+                    Console.WriteLine("\nError processing image {0} (File is corrupt or does not exist)", cellImagePaths[i]);
                     continue;
                 }
                 this._cellImages[i] = new ImageMeta(cellBitmap, cellImagePaths[i]);
                 cellBitmap.Dispose();
             }
+
+            Console.WriteLine();
+
             this._cellImages = this._cellImages.Where(path => path != null).ToArray();
 
             // Fit our images into the baseImage's aspect ratio.
@@ -97,6 +162,20 @@ namespace CollageMaker
 
             // Split up the base image into PartialImageMeta cells.
             this._baseImageCells = PartialImageMeta.ArrayFromImage(baseBitmap, baseImagePath, numRows, numCols);
+
+            if (this._cellImages.Length < this._baseImageCells.Length) {
+                int prevCellImagesLength = this._cellImages.Length;
+                Array.Resize(ref this._cellImages, this._baseImageCells.Length);
+
+                // Add filler cells as necessary.
+                for (int i = prevCellImagesLength; i < this._baseImageCells.Length; i++)
+                {
+                    this._cellImages[i] = this._cellImages[i - prevCellImagesLength];
+                }
+            }
+            Console.Write("Sorting cells... ");
+            SortCells();
+            Console.WriteLine("Done!");
         }
     }
 }
