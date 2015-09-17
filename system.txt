@@ -1,0 +1,25 @@
+How this will work:
+	1. Take an image to make and a directory of images to compose with.
+	2. Scan each image for an "overall color".
+	3. Figure out the resolution each image will need to be.
+	4. Go square by square in the target image, determing an "overall color" for each square.
+	5. Insert the images that most closely match each square.
+What I'll need:
+	Let's have an ImageMeta class to save RAM with:
+		A property indicating overall color
+		A property indicating resolution
+		A property indicating file location
+		Facility to determine distance from another ImageMeta (on overall color)
+		No open handle to the file except when necessary.
+	And a PartialImageMeta : ImageMeta to enable looking at cells of the base image, with:
+		The start point and size within base image.
+	A "Collage" object with:
+		An ImageMeta property "Base Image"
+		A PartialImageMeta[] BaseImageCells, with meta information on each cell in the base image.
+			For bonus points, initialize an array of these without closing the image file.
+		A ImageMeta[] property "Cell Images"
+		Can be constructed from an Image BaseImage an Image[] CellImages.
+		Has a method "Sort Cells" that sorts "Cell Images" to Best fit the base image colors.
+		Has a method "To Image" that returns an Image object containing the cell images arranged and resized to best mimic the base image.
+			For resizing, take the square, resize image fit entire image in square, center in square and add transparency where not filled.
+			Depends on "Sort Cells" being called first.
