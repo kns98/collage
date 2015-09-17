@@ -40,9 +40,9 @@ namespace CollageMaker
                     ImageMeta cellImage = this._cellImages[(y * this._sizeImages.Width) + x];
 
                     // Open and resize the bitmap of the cellImage.
-                    int scalar = Math.Min(cellWidth / cellImage.Size.Width, cellHeight / cellImage.Size.Height);
+                    float scalar = Math.Min(cellWidth / (float)cellImage.Size.Width, cellHeight / (float)cellImage.Size.Height);
                     Bitmap cellBitmap = new Bitmap(cellImage.Path);
-                    cellBitmap = new Bitmap(cellBitmap, new Size(cellImage.Size.Width * scalar, cellImage.Size.Height * scalar));
+                    cellBitmap = new Bitmap(cellBitmap, new Size((int)(cellImage.Size.Width * scalar), (int)(cellImage.Size.Height * scalar)));
 
                     // Find the offset needed (X or Y) to center the image on the square.
                     int offsetX = (cellBitmap.Width < cellWidth ? (cellWidth - cellBitmap.Width) / 2 : 0);
@@ -67,13 +67,25 @@ namespace CollageMaker
             this._sizePixels = size;
             Bitmap baseBitmap = new Bitmap(baseImagePath);
             this._baseImage = new ImageMeta(baseBitmap, baseImagePath);
-            this._cellImages = new PartialImageMeta[cellImagePaths.Length];
-
+            this._cellImages = new ImageMeta[cellImagePaths.Length];
+            
             // Get ImageMetas from the cell images.
             for (int i = 0; i < cellImagePaths.Length; i++)
             {
-                this._cellImages[i] = new ImageMeta(new Bitmap(cellImagePaths[i]), cellImagePaths[i]);
+                Bitmap cellBitmap;
+                try
+                {
+                    cellBitmap = new Bitmap(cellImagePaths[i]);
+                }
+                catch (ArgumentException ex)
+                {
+                    Console.WriteLine("Error processing image {0}:\n{1}", cellImagePaths[i], ex.ToString());
+                    continue;
+                }
+                this._cellImages[i] = new ImageMeta(cellBitmap, cellImagePaths[i]);
+                cellBitmap.Dispose();
             }
+            this._cellImages = this._cellImages.Where(path => path != null).ToArray();
 
             // Fit our images into the baseImage's aspect ratio.
             int numCols = (int)((baseBitmap.Width / (float)baseBitmap.Height) * Math.Sqrt(cellImagePaths.Length));

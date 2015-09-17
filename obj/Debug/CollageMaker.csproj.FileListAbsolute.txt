@@ -1,1 +1,6 @@
 C:\Drive\working\collage\CollageMaker\bin\Debug\CollageMaker.exe.config
+C:\Drive\working\collage\CollageMaker\bin\Debug\CollageMaker.exe
+C:\Drive\working\collage\CollageMaker\bin\Debug\CollageMaker.pdb
+C:\Drive\working\collage\CollageMaker\obj\Debug\CollageMaker.csprojResolveAssemblyReference.cache
+C:\Drive\working\collage\CollageMaker\obj\Debug\CollageMaker.exe
+C:\Drive\working\collage\CollageMaker\obj\Debug\CollageMaker.pdb

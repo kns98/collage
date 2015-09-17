@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+#if TIMEIT
+using System.Diagnostics;
+#endif
 
 namespace CollageMaker
 {
@@ -45,44 +48,45 @@ namespace CollageMaker
         /// <returns></returns>
         public static Color CalculateAverageColor(Bitmap bitmap)
         {
-            const int BITS_IN_PIXEL = 4;
-            BitmapData srcData = bitmap.LockBits(
-                new Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                ImageLockMode.ReadOnly,
-                PixelFormat.Format32bppArgb);
-
+#if TIMEIT
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+#endif
+            long[] totals = new long[] { 0, 0, 0 };
+            BitmapData srcData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
             int stride = srcData.Stride;
-
             IntPtr Scan0 = srcData.Scan0;
 
-            long[] totals = new long[] { 0, 0, 0 };
-
-            int width = bitmap.Width;
-            int height = bitmap.Height;
+            int bppModifier = bitmap.PixelFormat == System.Drawing.Imaging.PixelFormat.Format24bppRgb ? 3 : 4;
 
             unsafe
             {
                 byte* p = (byte*)(void*)Scan0;
-                for (int y = 0; y < bitmap.Width; y++)
+
+                for (int x = 0; x < bitmap.Width; x++)
                 {
-                    for (int x = 0; x < bitmap.Height; x++)
+                    for (int y = 0; y < bitmap.Height; y++)
                     {
-                        for (int color = 0; color < 3; color++)
-                        {
-                            int idx = (y * stride) + x * BITS_IN_PIXEL + color;
-                            totals[color] += p[idx];
-                        }
+                        int idx = (y * stride) + x * bppModifier;
+                        totals[2] += p[idx + 2];
+                        totals[1] += p[idx + 1];
+                        totals[0] += p[idx];
                     }
                 }
             }
 
             bitmap.UnlockBits(srcData);
 
-            long avgB = totals[0] / (bitmap.Width * bitmap.Height);
-            long avgG = totals[1] / (bitmap.Width * bitmap.Height);
-            long avgR = totals[2] / (bitmap.Width * bitmap.Height);
+            int avgR = (int)(totals[2] / (bitmap.Width * bitmap.Height));
+            int avgG = (int)(totals[1] / (bitmap.Width * bitmap.Height));
+            int avgB = (int)(totals[0] / (bitmap.Width * bitmap.Height));
 
-            return Color.FromArgb((int)avgR, (int)avgG, (int)avgB);
+#if TIMEIT
+            stopwatch.Stop();
+            Trace.WriteLine("CalculateAverageColor Time elapsed: " + (stopwatch.ElapsedMilliseconds / 1000.0).ToString());
+#endif
+
+            return Color.FromArgb(avgR, avgG, avgB);
 
         }
 

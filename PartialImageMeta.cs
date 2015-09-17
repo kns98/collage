@@ -23,7 +23,7 @@ namespace CollageMaker
             {
                 for (int y = 0; y < numRows; y++)
                 {
-                    cells[(x * numCols) + y] = new PartialImageMeta(sourceImage, sourceImagePath, new Point(y * cellWidth, x * cellHeight), new Size(cellWidth, cellHeight));
+                    cells[(y * numCols) + x] = new PartialImageMeta(sourceImage, sourceImagePath, new Point(x * cellWidth, y * cellHeight), new Size(cellWidth, cellHeight));
                 }
             }
 
