@@ -17,8 +17,8 @@ What I'll need:
 		An ImageMeta property "Base Image"
 		A PartialImageMeta[] BaseImageCells, with meta information on each cell in the base image.
 			For bonus points, initialize an array of these without closing the image file.
-		A ImageMeta[] property "Cell Images"
-		Can be constructed from an Image BaseImage an Image[] CellImages.
+		An ImageMeta[] property "Cell Images"
+		Can be constructed from a string BaseImagePath a string[] CellImagePaths.
 		Has a method "Sort Cells" that sorts "Cell Images" to Best fit the base image colors.
 		Has a method "To Image" that returns an Image object containing the cell images arranged and resized to best mimic the base image.
 			For resizing, take the square, resize image fit entire image in square, center in square and add transparency where not filled.
