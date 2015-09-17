@@ -72,8 +72,8 @@ namespace CollageMaker
         /// <returns></returns>
         public Bitmap ToImage(ResizeType resizeType)
         {
-            int cellWidth = this._sizePixels.Width / this._sizeImages.Width;
-            int cellHeight = this._sizePixels.Height / this._sizeImages.Height;
+            float cellWidth = this._sizePixels.Width / (float)this._sizeImages.Width;
+            float cellHeight = this._sizePixels.Height / (float)this._sizeImages.Height;
             
             // Create a canvas to work on.
             Bitmap finalBitmap = new Bitmap(this._sizePixels.Width, this._sizePixels.Height, PixelFormat.Format32bppArgb);
@@ -85,7 +85,7 @@ namespace CollageMaker
             {
                 for (int x = 0; x < this._sizeImages.Width; x++)
                 {
-                    Console.Write("\rCompositing image {0} of {1}.", (y * this._sizeImages.Width) + x, this._cellImages.Length);
+                    Console.Write("\rCompositing image {0} of {1}.", (y * this._sizeImages.Width) + x + 1, this._sizeImages.Width * this._sizeImages.Height);
                     ImageMeta cellImage = this._cellImages[(y * this._sizeImages.Width) + x];
 
                     // Open and resize the bitmap of the cellImage.
@@ -93,22 +93,22 @@ namespace CollageMaker
                     switch (resizeType)
                     {
                         case ResizeType.Fit:
-                            float fitScalar = Math.Min(cellWidth / (float)cellImage.Size.Width, cellHeight / (float)cellImage.Size.Height);
+                            float fitScalar = Math.Min(cellWidth / cellImage.Size.Width, cellHeight / cellImage.Size.Height);
                             cellBitmap = new Bitmap(cellBitmap, new Size((int)(cellImage.Size.Width * fitScalar), (int)(cellImage.Size.Height * fitScalar)));
                             break;
                         case ResizeType.Stretch:
-                            float stretchScalarX = cellWidth / (float)cellImage.Size.Width;
-                            float stretchScalarY = cellHeight / (float)cellImage.Size.Height;
+                            float stretchScalarX = cellWidth / cellImage.Size.Width;
+                            float stretchScalarY = cellHeight / cellImage.Size.Height;
                             cellBitmap = new Bitmap(cellBitmap, new Size((int)(cellImage.Size.Width * stretchScalarX), (int)(cellImage.Size.Height * stretchScalarY)));
                             break;
                     }
 
                     // Find the offset needed (X or Y) to center the image on the square.
-                    int offsetX = (cellBitmap.Width < cellWidth ? (cellWidth - cellBitmap.Width) / 2 : 0);
-                    int offsetY = (cellBitmap.Height < cellHeight ? (cellHeight - cellBitmap.Height) / 2 : 0);
+                    float offsetX = (cellBitmap.Width < cellWidth ? (cellWidth - cellBitmap.Width) / 2 : 0);
+                    float offsetY = (cellBitmap.Height < cellHeight ? (cellHeight - cellBitmap.Height) / 2 : 0);
 
                     // Draw the cell onto the canvas.
-                    graphics.DrawImage(cellBitmap, new Point((x * cellWidth) + offsetX, (y * cellHeight) + offsetY));
+                    graphics.DrawImage(cellBitmap, new PointF((x * cellWidth) + offsetX, (y * cellHeight) + offsetY));
                 }
             }
 
@@ -132,7 +132,7 @@ namespace CollageMaker
             // Get ImageMetas from the cell images.
             for (int i = 0; i < cellImagePaths.Length; i++)
             {
-                Console.Write("\rProcessing Image {0} of {1}", i, cellImagePaths.Length);
+                Console.Write("\rExtracting metadata from Image {0} of {1}", i + 1, cellImagePaths.Length);
 
                 Bitmap cellBitmap;
                 try
@@ -155,10 +155,12 @@ namespace CollageMaker
             // Fit our images into the baseImage's aspect ratio.
             int numCols = (int)((baseBitmap.Width / (float)baseBitmap.Height) * Math.Sqrt(cellImagePaths.Length));
             int numRows = (int)((baseBitmap.Height / (float)baseBitmap.Width) * Math.Sqrt(cellImagePaths.Length));
-            this._sizeImages = new Size(numCols, numRows);
+
             // Correct rounding
             while (numRows * numCols < cellImagePaths.Length)
                 numRows++;
+
+            this._sizeImages = new Size(numCols, numRows);
 
             // Split up the base image into PartialImageMeta cells.
             this._baseImageCells = PartialImageMeta.ArrayFromImage(baseBitmap, baseImagePath, numRows, numCols);
