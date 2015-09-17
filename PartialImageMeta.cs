@@ -19,11 +19,11 @@ namespace CollageMaker
             int cellWidth = sourceImage.Width / numCols;
             int cellHeight = sourceImage.Height / numRows;
             
-            for (int i = 0; i < numRows; i++)
+            for (int x = 0; x < numCols; x++)
             {
-                for (int j = 0; j < numCols; j++)
+                for (int y = 0; y < numRows; y++)
                 {
-                    cells[(i * numCols) + j] = new PartialImageMeta(sourceImage, sourceImagePath, new Point(j * cellWidth, i * cellHeight), new Size(cellWidth, cellHeight));
+                    cells[(x * numCols) + y] = new PartialImageMeta(sourceImage, sourceImagePath, new Point(y * cellWidth, x * cellHeight), new Size(cellWidth, cellHeight));
                 }
             }
 
