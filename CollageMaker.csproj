@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collage.cs" />
+    <Compile Include="ColorUtil.cs" />
     <Compile Include="ImageMeta.cs" />
     <Compile Include="PartialImageMeta.cs" />
     <Compile Include="Program.cs" />

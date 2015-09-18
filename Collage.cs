@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
-using System.Collections;
 
 namespace CollageMaker
 {
@@ -36,8 +33,10 @@ namespace CollageMaker
             }
         }
 
-        private void SortCells()
+        public void SortCells(ColorUtil.ColorDistanceType distanceType)
         {
+            Console.Write("Sorting cells... ");
+
             List<ImageMeta> cellImages = new List<ImageMeta>(this._cellImages);
             ImageMeta[] sortedCellImages = new ImageMeta[this._cellImages.Length];
 
@@ -51,7 +50,7 @@ namespace CollageMaker
                 int minIndex = -1;
                 for (int j = 0; j < cellImages.Count; j++)
                 {
-                    float distance = cellImages[j].Distance(this._baseImageCells[i]);
+                    float distance = cellImages[j].Distance(this._baseImageCells[i], distanceType);
                     if (distance < min)
                     {
                         min = distance;
@@ -63,6 +62,8 @@ namespace CollageMaker
             }
 
             this._cellImages = sortedCellImages;
+
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
@@ -175,9 +176,6 @@ namespace CollageMaker
                     this._cellImages[i] = this._cellImages[i - prevCellImagesLength];
                 }
             }
-            Console.Write("Sorting cells... ");
-            SortCells();
-            Console.WriteLine("Done!");
         }
     }
 }
