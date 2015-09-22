@@ -18,7 +18,14 @@ namespace CollageMaker
             // args[6] is the colorDistanceType (euclid or deltae)
             if (args.Length != 7)
             {
-                Console.WriteLine("Usage: CollageMaker.exe baseImage cellDirectory outFilePath width height fit|stretch");
+                Console.WriteLine("USAGE: collagemaker baseImage cellDirectory outFilePath width height fit|stretch euclid|deltae");
+                Console.WriteLine("    baseImage: Path to the image whose colors the collage will mimic.");
+                Console.WriteLine("    cellDirectory: Directory containing the image files that will make up the collage.");
+                Console.WriteLine("    outFilePath: The path to the final collage output file.");
+                Console.WriteLine("    width: The width, in pixels, of the output file");
+                Console.WriteLine("    height: The height, in pixels, of the output file");
+                Console.WriteLine("    fit|stretch: (choose one) whether to fit (with transparency) or stretch cells that don't share the aspect ratio of the baseImage.");
+                Console.WriteLine("    euclid|deltae: (choose one) which color distance algorithm to use.  Deltae = high quality but slower, euclid = low quality but faster.");
                 Console.WriteLine();
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
