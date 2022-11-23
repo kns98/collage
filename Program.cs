@@ -48,7 +48,7 @@ namespace CollageMaker
                 select file;
 
             var fileQuery1 = _fileQuery1.ToArray();
-            var len1 = Math.Min(100, fileQuery1.Length / 10);
+            var len1 = Math.Min(30, fileQuery1.Length / 10);
             var bag1 = Add(new FileInfo[len1], new Random(), fileQuery1);
 
             return bag1;
@@ -59,20 +59,24 @@ namespace CollageMaker
 
     static void Main(string[] args)
         {
-            var files = GetFiles().ToArray();
-            var filenames = from f in files select f.FullName;
-            var filenames_arr = filenames.ToArray();
+            for (int i = 0; i < 100; i++)
+            {
+                var files = GetFiles().ToArray();
+                var filenames = from f in files select f.FullName;
+                var filenames_arr = filenames.ToArray();
 
-            var rndm = new Random().Next(0, filenames_arr.Length);
+                var rndm = new Random().Next(0, filenames_arr.Length);
 
-            Collage collage = new Collage(filenames_arr[rndm] , filenames_arr, new Size(10000, 10000));
-            Collage.ResizeType resizeType = Collage.ResizeType.Fit;
-            ColorUtil.ColorDistanceType colorDistanceType = ColorUtil.ColorDistanceType.DeltaE;
-            collage.SortCells(colorDistanceType);
-            Bitmap collageBitmap = collage.ToImage(resizeType);
-            collageBitmap.Save(@"d:\output.png", ImageFormat.Png);
+                Collage collage = new Collage(filenames_arr[rndm], filenames_arr, new Size(10000, 10000));
+                Collage.ResizeType resizeType = Collage.ResizeType.Fit;
+                ColorUtil.ColorDistanceType colorDistanceType = ColorUtil.ColorDistanceType.DeltaE;
+                collage.SortCells(colorDistanceType);
+                Bitmap collageBitmap = collage.ToImage(resizeType);
 
+                collageBitmap.Save(@"d:\collage\output" + i + ".png", ImageFormat.Png);
+            }
 
+            Console.WriteLine("100 samples created");
             Console.ReadKey();
         }
     }
