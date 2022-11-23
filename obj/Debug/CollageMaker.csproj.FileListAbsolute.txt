@@ -4,3 +4,11 @@ C:\Drive\working\collage\CollageMaker\bin\Debug\CollageMaker.pdb
 C:\Drive\working\collage\CollageMaker\obj\Debug\CollageMaker.csprojResolveAssemblyReference.cache
 C:\Drive\working\collage\CollageMaker\obj\Debug\CollageMaker.exe
 C:\Drive\working\collage\CollageMaker\obj\Debug\CollageMaker.pdb
+C:\Users\kevin\source\repos\kns98\collage\bin\Debug\CollageMaker.exe.config
+C:\Users\kevin\source\repos\kns98\collage\bin\Debug\CollageMaker.exe
+C:\Users\kevin\source\repos\kns98\collage\bin\Debug\CollageMaker.pdb
+C:\Users\kevin\source\repos\kns98\collage\obj\Debug\CollageMaker.csproj.AssemblyReference.cache
+C:\Users\kevin\source\repos\kns98\collage\obj\Debug\CollageMaker.csproj.SuggestedBindingRedirects.cache
+C:\Users\kevin\source\repos\kns98\collage\obj\Debug\CollageMaker.csproj.CoreCompileInputs.cache
+C:\Users\kevin\source\repos\kns98\collage\obj\Debug\CollageMaker.exe
+C:\Users\kevin\source\repos\kns98\collage\obj\Debug\CollageMaker.pdb
