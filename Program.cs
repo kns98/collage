@@ -1,52 +1,152 @@
-﻿using System;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 
 namespace CollageMaker
 {
     class Program
     {
-        static void Main(string[] args)
+        private static ConcurrentBag<FileInfo> Add(FileInfo[] sel, Random random, FileInfo[] query)
         {
-            // args[0] is the base image.
-            // args[1] is the directory containing cell images.
-            // args[2] is the output file path.
-            // args[3] is the resolution in pixels (width)
-            // args[4] is the resolution in pixels (height)
-            // args[5] is the resizeType (fit or stretch)
-            // args[6] is the colorDistanceType (euclid or deltae)
-            if (args.Length != 7)
+            var bag = new ConcurrentBag<FileInfo>();
+
+            for (var i = 0; i < sel.Length; i++)
             {
-                Console.WriteLine("USAGE: collagemaker baseImage cellDirectory outFilePath width height fit|stretch euclid|deltae");
-                Console.WriteLine("    baseImage: Path to the image whose colors the collage will mimic.");
-                Console.WriteLine("    cellDirectory: Directory containing the image files that will make up the collage.");
-                Console.WriteLine("    outFilePath: The path to the final collage output file.");
-                Console.WriteLine("    width: The width, in pixels, of the output file");
-                Console.WriteLine("    height: The height, in pixels, of the output file");
-                Console.WriteLine("    fit|stretch: (choose one) whether to fit (with transparency) or stretch cells that don't share the aspect ratio of the baseImage.");
-                Console.WriteLine("    euclid|deltae: (choose one) which color distance algorithm to use.  Deltae = high quality but slower, euclid = low quality but faster.");
-                Console.WriteLine();
-                Console.WriteLine("Press any key to continue.");
-                Console.ReadKey();
-                return;
+                var indexToGetImageFrom = random.Next(query.Length);
+                try
+                {
+                    bag.Add(query[indexToGetImageFrom]);
+                    
+                }
+                catch (Exception ex)
+                {
+                }
             }
 
-            Collage collage = new Collage(args[0], Directory.GetFiles(args[1]), new Size(int.Parse(args[3]), int.Parse(args[4])));
-            Collage.ResizeType resizeType = args[5].Equals("stretch", StringComparison.CurrentCultureIgnoreCase) ? Collage.ResizeType.Stretch : Collage.ResizeType.Fit;
-            ColorUtil.ColorDistanceType colorDistanceType = args[6].Equals("deltae", StringComparison.CurrentCultureIgnoreCase) ? ColorUtil.ColorDistanceType.DeltaE : ColorUtil.ColorDistanceType.Euclidean;
+            return bag;
+        }
+
+        private static ConcurrentBag<FileInfo> GetFiles()
+        {
+            var info = new DirectoryInfo(@"d:\onedrive");
+
+            //BMP, GIF, EXIF, JPG, PNG, and TIFF
+
+            IEnumerable<FileInfo> fileList1 = info.GetFiles("*.bmp",
+                SearchOption.AllDirectories);
+            IEnumerable<FileInfo> fileList2 = info.GetFiles("*.gif",
+                SearchOption.AllDirectories);
+            IEnumerable<FileInfo> fileList3 = info.GetFiles("*.exif",
+                SearchOption.AllDirectories);
+            IEnumerable<FileInfo> fileList4 = info.GetFiles("*.jpg",
+                SearchOption.AllDirectories);
+            IEnumerable<FileInfo> fileList5 = info.GetFiles("*.jpeg",
+               SearchOption.AllDirectories);
+            IEnumerable<FileInfo> fileList6 = info.GetFiles("*.png",
+                SearchOption.AllDirectories);
+            IEnumerable<FileInfo> fileList7 = info.GetFiles("*.tiff",
+                SearchOption.AllDirectories);
+
+            IEnumerable<FileInfo> _fileQuery1 =
+                from file in fileList1
+                where file.Length > 0
+                orderby file.Name
+                select file;
+
+            var fileQuery1 = _fileQuery1.ToArray();
+
+            IEnumerable<FileInfo> _fileQuery2 =
+                from file in fileList2
+                where file.Length > 0
+                orderby file.Name
+                select file;
+
+            var fileQuery2 = _fileQuery2.ToArray();
+
+            IEnumerable<FileInfo> _fileQuery3 =
+                from file in fileList3
+                where file.Length > 0
+                orderby file.Name
+                select file;
+
+            var fileQuery3 = _fileQuery3.ToArray();
+
+            IEnumerable<FileInfo> _fileQuery4 =
+                from file in fileList4
+                where file.Length > 0
+                orderby file.Name
+                select file;
+
+            var fileQuery4 = _fileQuery4.ToArray();
+
+            IEnumerable<FileInfo> _fileQuery5 =
+                from file in fileList5
+                where file.Length > 0
+                orderby file.Name
+                select file;
+
+            var fileQuery5 = _fileQuery5.ToArray();
+
+            IEnumerable<FileInfo> _fileQuery6 =
+                from file in fileList6
+                where file.Length > 0
+                orderby file.Name
+                select file;
+
+            var fileQuery6 = _fileQuery6.ToArray();
+
+            IEnumerable<FileInfo> _fileQuery7 =
+                from file in fileList7
+                where file.Length > 0
+                orderby file.Name
+                select file;
+
+            var fileQuery7 = _fileQuery7.ToArray();
+
+            var len1 = Math.Min(20, fileQuery1.Length / 10);
+            var len2 = Math.Min(20, fileQuery2.Length / 10);
+            var len3 = Math.Min(20, fileQuery3.Length / 10);
+            var len4 = Math.Min(20, fileQuery4.Length / 10);
+            var len5 = Math.Min(20, fileQuery5.Length / 10);
+            var len6 = Math.Min(20, fileQuery6.Length / 10);
+            var len7 = Math.Min(20, fileQuery7.Length / 10);
+
+            var bag1 = Add(new FileInfo[len1], new Random(), fileQuery1);
+            var bag2 = Add(new FileInfo[len2], new Random(), fileQuery2);
+            var bag3 = Add(new FileInfo[len3], new Random(), fileQuery3);
+            var bag4 = Add(new FileInfo[len4], new Random(), fileQuery4);
+            var bag5 = Add(new FileInfo[len5], new Random(), fileQuery5);
+            var bag6 = Add(new FileInfo[len6], new Random(), fileQuery6);
+            var bag7 = Add(new FileInfo[len7], new Random(), fileQuery7);
+
+            return
+                new ConcurrentBag<FileInfo>(bag1.Union(bag2).Union(bag3).
+                Union(bag4).Union(bag5).Union(bag6).Union(bag7)
+
+                );
+        }
+
+    static void Main(string[] args)
+        {
+            var files = GetFiles().ToArray();
+            var filenames = from f in files select f.FullName;
+            var filenames_arr = filenames.ToArray();
+
+            var rndm = new Random().Next(0, filenames_arr.Length);
+
+            Collage collage = new Collage(filenames_arr[rndm] , filenames_arr, new Size(10000, 10000));
+            Collage.ResizeType resizeType = Collage.ResizeType.Fit;
+            ColorUtil.ColorDistanceType colorDistanceType = ColorUtil.ColorDistanceType.DeltaE;
             collage.SortCells(colorDistanceType);
             Bitmap collageBitmap = collage.ToImage(resizeType);
-            Console.WriteLine("Writing image to {0}.", args[2]);
-            collageBitmap.Save(Path.Combine(Directory.GetCurrentDirectory(), args[2]), ImageFormat.Png);
+            collageBitmap.Save(@"d:\output.png", ImageFormat.Png);
 
-            // Collect garbage and flush the input buffer (so it doesn't immediately exit if a key was pressed earlier).
-            GC.Collect();
-            while (Console.KeyAvailable)
-                Console.ReadKey(true);
 
-            Console.WriteLine("Done!  Press any key to continue.", args[2]);
-            Console.ReadKey(true);
+            Console.ReadKey();
         }
     }
 }
