@@ -48,7 +48,7 @@ namespace CollageMaker
                 select file;
 
             var fileQuery1 = _fileQuery1.ToArray();
-            var len1 = Math.Min(12, fileQuery1.Length / 10);
+            var len1 = Math.Min(238, fileQuery1.Length);
             var bag1 = Add(new FileInfo[len1], new Random(), fileQuery1);
 
             return bag1;
