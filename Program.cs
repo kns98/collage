@@ -57,11 +57,17 @@ namespace CollageMaker
                 
         }
 
-    static void Main(string[] args)
+       
+
+        static void Main(string[] args)
         {
-            int seed =  int.Parse( args[0]);
-            int count = int.Parse(args[1]); 
-            int samples = int.Parse(args[2]);
+            string s = args[0];
+            int seed = s.GetHashCode();
+            var rndm = new Random(seed);
+            
+            int count = rndm.Next(1,1000); 
+            int samples = rndm.Next(1,1000);
+
             int i = 0;
 
             for (i=0; i < samples; i++)
@@ -70,9 +76,9 @@ namespace CollageMaker
                 var filenames = from f in files select f.FullName;
                 var filenames_arr = filenames.ToArray();
 
-                var rndm = new Random(seed).Next(0, filenames_arr.Length);
+                var skew = rndm.Next(0, filenames_arr.Length);
 
-                Collage collage = new Collage(filenames_arr[rndm], filenames_arr, new Size(20000, 20000));
+                Collage collage = new Collage(filenames_arr[skew], filenames_arr, new Size(count*200, count*200));
                 Collage.ResizeType resizeType = Collage.ResizeType.Fit;
                 ColorUtil.ColorDistanceType colorDistanceType = ColorUtil.ColorDistanceType.DeltaE;
                 collage.SortCells(colorDistanceType);
