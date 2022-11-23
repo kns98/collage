@@ -21,9 +21,9 @@ namespace CollageMaker
             Stretch
         };
 
-        private void Shuffle(ref int[] arr)
+        private void Shuffle(ref int[] arr, Random gen)
         {
-            Random gen = new Random();
+            
             for (int i = arr.Length - 1; i > 0; i--)
             {
                 int j = gen.Next(0, i);
@@ -33,7 +33,7 @@ namespace CollageMaker
             }
         }
 
-        public void SortCells(ColorUtil.ColorDistanceType distanceType)
+        public void SortCells(ColorUtil.ColorDistanceType distanceType, Random gen)
         {
             Console.Write("Sorting cells... ");
 
@@ -42,7 +42,7 @@ namespace CollageMaker
 
             // Shuffle the range (to avoid gradient appearance)
             int[] range = Enumerable.Range(0, this._baseImageCells.Length).ToArray();
-            Shuffle(ref range);
+            Shuffle(ref range, gen);
 
             foreach (int i in range)
             {
