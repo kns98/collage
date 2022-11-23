@@ -48,7 +48,7 @@ namespace CollageMaker
                 select file;
 
             var fileQuery1 = _fileQuery1.ToArray();
-            var len1 = Math.Min(30, fileQuery1.Length / 10);
+            var len1 = Math.Min(12, fileQuery1.Length / 10);
             var bag1 = Add(new FileInfo[len1], new Random(), fileQuery1);
 
             return bag1;
@@ -67,7 +67,7 @@ namespace CollageMaker
 
                 var rndm = new Random().Next(0, filenames_arr.Length);
 
-                Collage collage = new Collage(filenames_arr[rndm], filenames_arr, new Size(10000, 10000));
+                Collage collage = new Collage(filenames_arr[rndm], filenames_arr, new Size(4000, 4000));
                 Collage.ResizeType resizeType = Collage.ResizeType.Fit;
                 ColorUtil.ColorDistanceType colorDistanceType = ColorUtil.ColorDistanceType.DeltaE;
                 collage.SortCells(colorDistanceType);
