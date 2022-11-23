@@ -30,7 +30,7 @@ namespace CollageMaker
             return bag;
         }
 
-        private static ConcurrentBag<FileInfo> GetFiles()
+        private static ConcurrentBag<FileInfo> GetFiles(int count)
         {
             var info = new DirectoryInfo(@"d:\onedrive");
 
@@ -48,7 +48,7 @@ namespace CollageMaker
                 select file;
 
             var fileQuery1 = _fileQuery1.ToArray();
-            var len1 = Math.Min(238, fileQuery1.Length);
+            var len1 = Math.Min(count, fileQuery1.Length);
             var bag1 = Add(new FileInfo[len1], new Random(), fileQuery1);
 
             return bag1;
@@ -60,23 +60,22 @@ namespace CollageMaker
     static void Main(string[] args)
         {
             int seed =  int.Parse( args[0]);
+            int count = int.Parse(args[1]); 
 
-            for (int i = 0; i < 100; i++)
-            {
-                var files = GetFiles().ToArray();
-                var filenames = from f in files select f.FullName;
-                var filenames_arr = filenames.ToArray();
+            var files = GetFiles(count).ToArray();
+            var filenames = from f in files select f.FullName;
+            var filenames_arr = filenames.ToArray();
 
-                var rndm = new Random(seed).Next(0, filenames_arr.Length);
+            var rndm = new Random(seed).Next(0, filenames_arr.Length);
 
-                Collage collage = new Collage(filenames_arr[rndm], filenames_arr, new Size(20000, 20000));
-                Collage.ResizeType resizeType = Collage.ResizeType.Fit;
-                ColorUtil.ColorDistanceType colorDistanceType = ColorUtil.ColorDistanceType.DeltaE;
-                collage.SortCells(colorDistanceType);
-                Bitmap collageBitmap = collage.ToImage(resizeType);
+            Collage collage = new Collage(filenames_arr[rndm], filenames_arr, new Size(20000, 20000));
+            Collage.ResizeType resizeType = Collage.ResizeType.Fit;
+            ColorUtil.ColorDistanceType colorDistanceType = ColorUtil.ColorDistanceType.DeltaE;
+            collage.SortCells(colorDistanceType);
+            Bitmap collageBitmap = collage.ToImage(resizeType);
 
-                collageBitmap.Save(@"d:\collage\output" + i + ".png", ImageFormat.Png);
-            }
+            collageBitmap.Save(@"d:\collage\output.png", ImageFormat.Png);
+            
 
             Console.WriteLine("100 samples created");
             Console.ReadKey();
