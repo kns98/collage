@@ -61,23 +61,27 @@ namespace CollageMaker
         {
             int seed =  int.Parse( args[0]);
             int count = int.Parse(args[1]); 
+            int samples = int.Parse(args[2]);
+            int i = 0;
 
-            var files = GetFiles(count).ToArray();
-            var filenames = from f in files select f.FullName;
-            var filenames_arr = filenames.ToArray();
+            for (i=0; i < samples; i++)
+            {
+                var files = GetFiles(count).ToArray();
+                var filenames = from f in files select f.FullName;
+                var filenames_arr = filenames.ToArray();
 
-            var rndm = new Random(seed).Next(0, filenames_arr.Length);
+                var rndm = new Random(seed).Next(0, filenames_arr.Length);
 
-            Collage collage = new Collage(filenames_arr[rndm], filenames_arr, new Size(20000, 20000));
-            Collage.ResizeType resizeType = Collage.ResizeType.Fit;
-            ColorUtil.ColorDistanceType colorDistanceType = ColorUtil.ColorDistanceType.DeltaE;
-            collage.SortCells(colorDistanceType);
-            Bitmap collageBitmap = collage.ToImage(resizeType);
+                Collage collage = new Collage(filenames_arr[rndm], filenames_arr, new Size(20000, 20000));
+                Collage.ResizeType resizeType = Collage.ResizeType.Fit;
+                ColorUtil.ColorDistanceType colorDistanceType = ColorUtil.ColorDistanceType.DeltaE;
+                collage.SortCells(colorDistanceType);
+                Bitmap collageBitmap = collage.ToImage(resizeType);
 
-            collageBitmap.Save(@"d:\collage\output.png", ImageFormat.Png);
-            
+                collageBitmap.Save(@"d:\collage\output-"+ i + ".png", ImageFormat.Png);
+            }
 
-            Console.WriteLine("100 samples created");
+            Console.WriteLine(i + " samples created");
             Console.ReadKey();
         }
     }
