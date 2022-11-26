@@ -31,7 +31,7 @@ namespace CollageMaker
             return bag;
         }
 
-        private static ConcurrentBag<FileInfo> GetFiles(int count, Random rand)
+        private static ConcurrentBag<FileInfo> GetFiles(string path, int count, Random rand)
         {
             var info = new DirectoryInfo(@"d:\onedrive");
 
@@ -62,8 +62,16 @@ namespace CollageMaker
 
         static void Main(string[] args)
         {
-            string s = args[0];
-            int seed = s.GetHashCode();
+            Console.WriteLine("Welcome to Collage Maker!");
+            Console.WriteLine("");
+            Console.Write("Please enter the full path of the folder you wish to search :");
+            var sourcepath = Console.ReadLine();
+            Console.Write("Please enter the output path :");
+            var outpath = Console.ReadLine();
+            Console.Write("Please enter a phrase (anything that comes to mind) :");
+            var phrase = Console.ReadLine();
+            int seed = phrase.GetHashCode();
+
             var rndm = new Random(seed);
             int samples = rndm.Next(1, 100);
 
@@ -71,14 +79,14 @@ namespace CollageMaker
 
             Parallel.For(0, samples, (sample =>
             {
-                int count = rndm.Next(1, 100);
-                var files = GetFiles(count, rndm).ToArray();
+                int count = rndm.Next(1, 50);
+                var files = GetFiles(sourcepath,count, rndm).ToArray();
                 var filenames = from f in files select f.FullName;
                 var filenames_arr = filenames.ToArray();
 
                 var skew = rndm.Next(0, filenames_arr.Length);
 
-                int width = (int)Math.Sqrt(400 * 400 * count);
+                int width = (int)Math.Sqrt(800 * 800 * count);
 
                 Collage collage = new Collage(filenames_arr[skew], filenames_arr, new Size(width, width));
                 Collage.ResizeType resizeType = Collage.ResizeType.Fit;
@@ -86,7 +94,7 @@ namespace CollageMaker
                 collage.SortCells(colorDistanceType, rndm);
                 Bitmap collageBitmap = collage.ToImage(resizeType);
 
-                collageBitmap.Save(@"d:\collage\output-" + sample + ".png", ImageFormat.Png);
+                collageBitmap.Save(outpath + sample + ".png", ImageFormat.Png);
             }));
 
             Console.WriteLine(i + " samples created");
