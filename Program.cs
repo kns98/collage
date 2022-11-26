@@ -33,7 +33,7 @@ namespace CollageMaker
 
         private static ConcurrentBag<FileInfo> GetFiles(string path, int count, Random rand)
         {
-            var info = new DirectoryInfo(@"d:\onedrive");
+            var info = new DirectoryInfo(path);
 
             //BMP, GIF, EXIF, JPG, PNG, and TIFF
 
@@ -94,7 +94,7 @@ namespace CollageMaker
                 collage.SortCells(colorDistanceType, rndm);
                 Bitmap collageBitmap = collage.ToImage(resizeType);
 
-                collageBitmap.Save(outpath + sample + ".png", ImageFormat.Png);
+                collageBitmap.Save( Path.Combine (outpath , sample + ".png"), ImageFormat.Png);
             }));
 
             Console.WriteLine(i + " samples created");
